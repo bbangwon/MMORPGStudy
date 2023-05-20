@@ -15,18 +15,69 @@
 
         public void Initialize(int size)
         {
+            //size는 무조건 홀수
+            if(size % 2 == 0)
+                return;
+
             _tile = new TileType[size, size];
             _size = size;
 
-            for (int y=0;y < _size;y++)
+            GenerateByBinaryTree();
+
+            
+        }
+
+        private void GenerateByBinaryTree()
+        {
+            //길을 다 막는 작업
+            for (int y = 0; y < _size; y++)
             {
-                for(int x=0;x < _size;x++)
+                for (int x = 0; x < _size; x++)
                 {
-                    if (x == 0 || x == _size - 1 ||
-                        y == 0 || y == _size - 1)
-                        _tile[y, x] = TileType.Wall;
+                    if (x % 2 == 0 || y % 2 == 0)
+                        _tile![y, x] = TileType.Wall;
                     else
-                        _tile[y, x] = TileType.Empty;
+                        _tile![y, x] = TileType.Empty;
+                }
+            }
+
+            //랜덤으로 우측 혹은 아래로 길을 뚫는 작업
+            //Binary Tree Algorithm
+
+            Random rand = new Random();
+            for (int y = 0; y < _size; y++)
+            {
+                for (int x = 0; x < _size; x++)
+                {
+                    if (x % 2 == 0 || y % 2 == 0)
+                        continue;
+
+                    if (y == _size - 2 && x == _size - 2)
+                        continue;
+
+                    if (y == _size - 2)
+                    {
+                        //무조건 우측으로
+                        _tile![y, x + 1] = TileType.Empty;
+                        continue;
+                    }
+
+                    if (x == _size - 2)
+                    {
+                        //무조건 아래로
+                        _tile![y + 1, x] = TileType.Empty;
+                        continue;
+                    }
+
+                    if (rand.Next(0, 2) == 0)
+                    {
+                        _tile![y, x + 1] = TileType.Empty;
+                    }
+                    else
+                    {
+                        _tile![y + 1, x] = TileType.Empty;
+                    }
+
                 }
             }
         }
