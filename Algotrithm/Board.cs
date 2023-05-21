@@ -22,9 +22,66 @@
             _tile = new TileType[size, size];
             _size = size;
 
-            GenerateByBinaryTree();
+            //GenerateByBinaryTree();
+            GenerateBySideWinder();
 
             
+        }
+
+        private void GenerateBySideWinder()
+        {
+            //길을 다 막는 작업
+            for (int y = 0; y < _size; y++)
+            {
+                for (int x = 0; x < _size; x++)
+                {
+                    if (x % 2 == 0 || y % 2 == 0)
+                        _tile![y, x] = TileType.Wall;
+                    else
+                        _tile![y, x] = TileType.Empty;
+                }
+            }
+
+            Random rand = new Random();
+            for (int y = 0; y < _size; y++)
+            {
+                int count = 1;
+                for (int x = 0; x < _size; x++)
+                {
+                    if (x % 2 == 0 || y % 2 == 0)
+                        continue;
+
+                    if (y == _size - 2 && x == _size - 2)
+                        continue;
+
+                    if (y == _size - 2)
+                    {
+                        //무조건 우측으로
+                        _tile![y, x + 1] = TileType.Empty;
+                        continue;
+                    }
+
+                    if (x == _size - 2)
+                    {
+                        //무조건 아래로
+                        _tile![y + 1, x] = TileType.Empty;
+                        continue;
+                    }
+
+                    if (rand.Next(0, 2) == 0)
+                    {
+                        _tile![y, x + 1] = TileType.Empty;
+                        count++;
+                    }
+                    else
+                    {
+                        int randomIndex = rand.Next(0, count);
+                        _tile![y + 1, x - randomIndex * 2] = TileType.Empty;
+                        count = 1;
+                    }
+
+                }
+            }
         }
 
         private void GenerateByBinaryTree()
