@@ -23,6 +23,7 @@
         };
 
         bool[] visited = new bool[6];
+        #region DFS
         // 1) now 방문
         // 2) now와 연결된 정점들을 하나씩 확인해서 아직 미방문 상태라면 방문
         public void DFS(int now)
@@ -30,14 +31,14 @@
             Console.WriteLine(now);
             visited[now] = true;
 
-            for(int next = 0;next < 6; next++)
+            for (int next = 0; next < 6; next++)
             {
                 //연결되어 있지 않으면 스킵
                 if (adj[now, next] == 0)
                     continue;
 
                 //이미 방문했으면 스킵
-                if (visited[next]) 
+                if (visited[next])
                     continue;
 
                 DFS(next);
@@ -49,7 +50,7 @@
             Console.WriteLine(now);
             visited[now] = true;
 
-            foreach(int next in adj2[now])
+            foreach (int next in adj2[now])
             {
                 //이미 방문했으면 스킵
                 if (visited[next])
@@ -65,12 +66,52 @@
             visited = new bool[6];
 
             //모든 방문 가능한 정점은 모두 방문한다.
-            for(int now = 0; now < 6; now++)
-            {                
+            for (int now = 0; now < 6; now++)
+            {
                 if (visited[now] == false)
                     DFS(now);
             }
+        } 
+        #endregion
+
+        public void BFS(int start)
+        {
+            bool[] found = new bool[6];
+
+            int[] parent = new int[6];
+            int[] distance = new int[6];
+            
+            Queue<int> q = new Queue<int>();
+            q.Enqueue(start);
+            found[start] = true;
+            parent[start] = start;
+            distance[start] = 0;
+
+            while (q.Count > 0)
+            {
+                int now = q.Dequeue();
+                Console.WriteLine(now);
+
+                for (int next = 0; next < 6;next++)
+                {
+                    //인접하지 않았으면 스킵
+                    if (adj[now, next] == 0)
+                        continue;
+
+                    //이미 발견했다면 스킵
+                    if (found[next])
+                        continue;
+
+                    q.Enqueue(next);
+                    found[next] = true;
+                    parent[next] = now;
+                    distance[next] = distance[now] + 1;
+                }
+            }
+
         }
+
+
     }
 
     class Program
@@ -80,7 +121,7 @@
             // DFS (Depth First Search : 깊이 우선 탐색)
             // BFS (Breadth First Search : 너비 우선 탐색)
             Graph graph = new Graph();
-            graph.SearchAll();
+            graph.BFS(0);
         }
     }
 }
