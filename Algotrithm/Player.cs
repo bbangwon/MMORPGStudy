@@ -39,6 +39,64 @@
 
             _board = board;
 
+            BFS();
+        }
+
+        void BFS()
+        {
+            int[] deltaY = new int[] { -1, 0, 1, 0 };
+            int[] deltaX = new int[] { 0, -1, 0, 1 };
+
+            bool[,] found = new bool[_board.Size, _board.Size];
+            Pos[,] parent = new Pos[_board.Size, _board.Size];
+
+            Queue<Pos> queue = new Queue<Pos>();
+            queue.Enqueue(new Pos(PosY, PosX));
+            found[PosY, PosX] = true;
+            parent[PosY, PosX] = new Pos(PosY, PosX);
+
+            while (queue.Count > 0)
+            {
+                Pos pos = queue.Dequeue();
+                int nowY = pos.Y;
+                int nowX = pos.X;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    int nextY = nowY + deltaY[i];
+                    int nextX = nowX + deltaX[i];
+
+                    if(nextX < 0 || nextX >= _board.Size || nextY < 0 || nextY >= _board.Size)
+                        continue;
+
+                    if (_board.Tile![nextY, nextX] == Board.TileType.Wall)
+                        continue;
+
+                    if (found[nextY, nextX])
+                        continue;
+
+                    queue.Enqueue(new Pos(nextY, nextX));
+                    found[nextY, nextX] = true;
+                    parent[nextY, nextX] = new Pos(nowY, nowX);
+                }
+            }
+
+            int y = _board.DestY;
+            int x = _board.DestX;
+
+            while (parent[y, x].Y != y || parent[y, x].X != x)
+            {
+                _points.Add(new Pos(y, x));
+                Pos pos = parent[y, x];
+                y = pos.Y;
+                x = pos.X;
+            }
+            _points.Add(new Pos(y, x));
+            _points.Reverse();
+        }
+
+        void RightHand()
+        {
             // 현재 바라보고 있는 방향을 기준으로, 좌표 변화를 나타낸다.
             int[] frontY = new int[] { -1, 0, 1, 0 };
             int[] frontX = new int[] { 0, -1, 0, 1 };
@@ -49,7 +107,7 @@
             _points.Add(new Pos(PosY, PosX));
 
             //목적지에 도착하기 전에는 계속 실행
-            while (PosX != board.DestY || PosX != board.DestX)
+            while (PosX != _board.DestY || PosX != _board.DestX)
             {
                 // 1. 현재 바라보는 방향을 기준으로 오른쪽으로 갈 수 있는지 확인
                 if (_board.Tile![PosY + rightY[_dir], PosX + rightX[_dir]] == Board.TileType.Empty)
@@ -80,7 +138,7 @@
             }
         }
 
-        const int MOVE_TICK = 10;
+        const int MOVE_TICK = 100;
         int _sumTick = 0;
         int _lastIndex = 0;
         public void Update(int deltaTick)
