@@ -62,9 +62,16 @@ namespace Algotrithm
 
         void AStar()
         {
+            // U L D R UL DL DR UR
+            //대각선 이동까지 적용
+            //int[] deltaY = new int[] { -1, 0, 1, 0, -1, 1, 1, -1 };
+            //int[] deltaX = new int[] { 0, -1, 0, 1, -1, -1, 1, 1 };
+            //int[] cost = new int[] { 10, 10, 10, 10, 14, 14, 14, 14 };
+
+            //상하좌우만 계산
             int[] deltaY = new int[] { -1, 0, 1, 0 };
             int[] deltaX = new int[] { 0, -1, 0, 1 };
-            int[] cost = new int[] { 1, 1, 1, 1 };
+            int[] cost = new int[] { 10, 10, 10, 10, 14, 14, 14, 14 };
 
             // 점수 매기기
             // F = G + H
@@ -90,9 +97,9 @@ namespace Algotrithm
             PriorityQueue<PQNode> pq = new PriorityQueue<PQNode>();
 
             // 시작점 발견
-            open[PosY, PosX] = Math.Abs(_board.DestY - PosY) + Math.Abs(_board.DestX - PosX);
+            open[PosY, PosX] = 10 * (Math.Abs(_board.DestY - PosY) + Math.Abs(_board.DestX - PosX));
             pq.Enqueue(new PQNode { 
-                F = Math.Abs(_board.DestY - PosY) + Math.Abs(_board.DestX - PosX),
+                F = 10 * (Math.Abs(_board.DestY - PosY) + Math.Abs(_board.DestX - PosX)),
                 G = 0, 
                 Y = PosY, 
                 X = PosX,
@@ -135,7 +142,7 @@ namespace Algotrithm
 
                     //비용 계산
                     int g = node.G + cost[i];
-                    int h = Math.Abs(_board.DestY - nextY) + Math.Abs(_board.DestX - nextX);
+                    int h = 10 * (Math.Abs(_board.DestY - nextY) + Math.Abs(_board.DestX - nextX));
                     //다른 경로에서 더 빠른 길 이미 찾았으면 스킵
                     if (open[nextY, nextX] < g + h)
                         continue;
@@ -257,13 +264,18 @@ namespace Algotrithm
             }
         }
 
-        const int MOVE_TICK = 100;
+        const int MOVE_TICK = 30;
         int _sumTick = 0;
         int _lastIndex = 0;
         public void Update(int deltaTick)
         {
             if (_lastIndex >= _points.Count)
-                return;
+            {
+                _lastIndex = 0;
+                _points.Clear();
+                _board.Initialize(_board.Size, this);
+                Initialize(1, 1, _board);
+            }                
 
             _sumTick += deltaTick;
             if(_sumTick >= MOVE_TICK)
